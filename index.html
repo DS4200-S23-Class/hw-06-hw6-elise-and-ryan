@@ -1,15 +1,41 @@
 <!DOCTYPE html>
 <html lang='en'>
 
-
 <head>
-  <meta charset='utf-8'>
-
+    <meta charset=utf-8/>
+    <link rel="stylesheet" href="style.css">
+    <script src="js/d3.v6.1.1/d3.min.js"></script>
+    <title> hw-06 </title>
 </head>
 
 
 <body>
- 
+    <h1> hw-06 - D3 Brushing & Linking </h1>
+    <div class="container">
+        <!-- left column with length scatterplot -->
+        <div class="column" id="col1">
+            <div id="vis1"></div>
+        </div>
+
+        <!-- middle column with width scatterplot -->
+        <div class="column" id="col2">
+            <div id="vis2"></div>
+        </div>
+      <!-- right column with bar chart -->
+        <div class="column" id="col3">
+            <div id="vis3"></div>
+        </div>
+    </div>
+    <h2> Acknowledgements </h2>
+
+    <div>
+        <ul>
+            <li><a href="https://masteringjs.io/tutorials/fundamentals/foreach-object"> Iterating for Bar Chart Hard Coding </a></li>
+            <li><a href="https://stackoverflow.com/questions/62997896/how-to-make-bars-have-different-colors-in-d3"> Different Color Bars </a></li>
+        </ul>
+    </div>
+
+    <script src="main.js"></script>
 </body>
 
 </html>
