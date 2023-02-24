@@ -1,32 +1,143 @@
 const frame_height = 500;
-const frame_width = 500;
-const margins = {left: 100, right: 100, top: 20, bottom:20};
-const S_MARGINS = {left: 30, right: 30, top: 30, bottom:30};
+const frame_width = 350;
+const margins = {left: 34, right: 30, top: 30, bottom: 30};
+//const S_MARGINS = {left: 30, right: 30, top: 30, bottom:30};
 
+const species_color = {setosa: "#7144d3", versicolor: "#eec84e", virginica: "#ae32a3"};
+
+//scatterplot part 1
+const FRAME1 =
+d3.select("#vis1")
+    .append("svg")
+        .attr("height", frame_height)
+        .attr("width", frame_width)
+        .attr("class", "frame");
+
+
+d3.csv("data/iris.csv").then((data) => {
+
+    const MAX_X = d3.max(data, (d) => {return parseInt(d.Petal_Length);});
+
+    const X_SCALE = d3.scaleLinear()
+        .domain([0, MAX_X + 1])
+        .range([0, frame_width - margins.left - margins.right]);
+
+    const MAX_Y = d3.max(data, (d) => {return parseInt(d.Sepal_Length);});
+
+    const Y_SCALE = d3.scaleLinear()
+        .domain([0, MAX_Y + 1])
+        .range([frame_height - margins.top - margins.bottom, 0]);
+
+    //Generates all points in the csv
+    FRAME1.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+            .attr("cx", (d) => { return (X_SCALE(d.Petal_Length) + margins.left); })
+            .attr("cy", (d) => { return (Y_SCALE(d.Sepal_Length) + margins.top); })
+            .attr("r", 5)
+            .attr("fill", (d) => { return species_color[d.Species] })
+            .attr("class", "point");
+
+
+    //Generates the x axis
+    FRAME1.append("g")
+        .attr("transform", "translate(" + margins.left +
+            "," + (frame_height - margins.bottom) + ")")
+        .call(d3.axisBottom(X_SCALE).ticks(5))
+            .attr("font-size", '18px');
+
+        //Generates the y axis
+    FRAME1.append("g")
+    .attr("transform", "translate(" + margins.left +
+        "," + margins.top + ")")
+    .call(d3.axisLeft().scale(Y_SCALE).ticks(10))
+        .attr("font-size", "18px");
+
+    FRAME1.append("text")
+        .attr("x", ((frame_width/3)))
+        .attr("y", (margins.top))
+        .text("Petal and Sepal Length")
+        .attr("class", "title");
+});
+
+//scatterplot part 2
+const FRAME2 =
+d3.select("#vis2")
+    .append("svg")
+        .attr("height", frame_height)
+        .attr("width", frame_width)
+        .attr("class", "frame");
+
+d3.csv("data/iris.csv").then((data) => {
+
+    const MAX_X = d3.max(data, (d) => {return parseInt(d.Petal_Width);});
+
+    const X_SCALE = d3.scaleLinear()
+        .domain([0, MAX_X + 1])
+        .range([0, frame_width - margins.left - margins.right]);
+
+    const MAX_Y = d3.max(data, (d) => {return parseInt(d.Sepal_Width);});
+
+    const Y_SCALE = d3.scaleLinear()
+        .domain([0, MAX_Y + 1])
+        .range([frame_height - margins.top - margins.bottom, 0]);
+
+    //Generates all points in the csv
+    FRAME2.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+            .attr("cx", (d) => { return (X_SCALE(d.Petal_Width) + margins.left); })
+            .attr("cy", (d) => { return (Y_SCALE(d.Sepal_Width) + margins.top); })
+            .attr("r", 5)
+            .attr("fill", (d) => { return species_color[d.Species] })
+            .attr("class", "point");
+
+
+    //Generates the x axis
+    FRAME2.append("g")
+        .attr("transform", "translate(" + margins.left +
+            "," + (frame_height - margins.bottom) + ")")
+        .call(d3.axisBottom(X_SCALE).ticks(5))
+            .attr("font-size", '18px');
+
+        //Generates the y axis
+    FRAME2.append("g")
+    .attr("transform", "translate(" + margins.left +
+        "," + margins.top + ")")
+    .call(d3.axisLeft().scale(Y_SCALE).ticks(10))
+        .attr("font-size", "18px");
+
+    FRAME2.append("text")
+        .attr("x", ((frame_width/3)))
+        .attr("y", (margins.top))
+        .text("Petal and Sepal Width")
+        .attr("class", "title");
+});
 
 //bar chart time
-const frame3 =
+const FRAME3 =
 d3.select("#vis3")
     .append("svg")
         .attr("height", frame_height)
         .attr("width", frame_width)
         .attr("class", "frame");
 
-const data = {setosa: 50, versicolor: 50, virginica: 50};
-colors = d3.scaleOrdinal(["#7144d3", "#eec84e", "#ae32a3"]);
-
+//for later to iterate colors through hard coded bar qty
+colors = d3.scaleOrdinal(Object.values(species_color));
 
 const y_scale =
 d3.scaleLinear()
-    .domain([0, (150)])
+    .domain([0, (95)])
     .range([(frame_height - margins.bottom), 0]);
 
 const x_scale =
 d3.scaleBand()
-    .domain(Object.keys(data))
+    .domain(Object.keys(species_color))
     .range([0, (frame_width - margins.right), 0]);
 
-frame3.append("g")
+FRAME3.append("g")
     .attr("transform", "translate(" + margins.left + ")")
     .call(
         d3.axisLeft()
@@ -35,7 +146,7 @@ frame3.append("g")
         )
         .attr("font-size", "20px");
 
-frame3.append("g")
+FRAME3.append("g")
     .attr("transform", "translate(" + margins.left + "," + (frame_height - margins.bottom) + ")")
     .call(
         d3.axisBottom()
@@ -43,38 +154,22 @@ frame3.append("g")
             .ticks(10)
         );
 
-//Object.values(data).forEach((element, index)) => {}
-
-//frame3.selectAll(".bar")
-//    .append("rect")
-//        .attr("transform", "translate(" + margins.left +  ")")
-//        .attr("x", Object.keys(data).forEach(key => {return (x_scale(key))}))
-//        .attr("y", Object.values(data).forEach(val => {return (y_scale(val))}))
-//        .attr("height", Object.values(data).forEach(val => { return ( frame_height - y_scale(val) - margins.bottom) }))
-//        .attr("width", x_scale.bandwidth() - 5)
-//        .attr("class", "bar");
-
-Object.entries(data).forEach(entry => {
+Object.entries(species_color).forEach(entry => {
     const [key, value] = entry;
-        frame3.append("rect")
+        FRAME3.append("rect")
             .attr("transform", "translate(" + margins.left +  ")")
             .attr("x", (x_scale(key)))
-            .attr("y", (y_scale(value)))
-            .attr("height", ( frame_height - y_scale(value) - margins.bottom))
+            .attr("y", (y_scale(50)))
+            .attr("height", ( frame_height - y_scale(50) - margins.bottom))
             .attr("width", x_scale.bandwidth() - 5)
-
             .attr("class", "bar");
-
 });
 
-frame3.selectAll(".bar")
+FRAME3.selectAll(".bar")
     .attr("fill", (d,i) => {return colors(i)});
 
-frame3.append("text")
+FRAME3.append("text")
     .attr("x", ((frame_width/2) - (margins.right/2)))
     .attr("y", (margins.top))
     .text("Orchid Species")
     .attr("class", "title");
-
-
-
