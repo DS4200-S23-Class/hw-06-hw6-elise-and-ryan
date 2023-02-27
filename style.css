@@ -34,12 +34,17 @@ h2{
   align-items: center;
 }
 
-.point{
+.pointone{
+    opacity: 0.5;
+}
+
+.pointtwo{
     opacity: 0.5;
 }
 
 .bar{
     opacity: 0.5;
+    stroke-width: 5;
 }
 
 .title{
