@@ -52,3 +52,9 @@ h2{
     text-decoration: underline;
     text-align: center;
 }
+
+.selected {
+  opacity: 1;
+  stroke: orange;
+  stroke-width: 1px;
+}

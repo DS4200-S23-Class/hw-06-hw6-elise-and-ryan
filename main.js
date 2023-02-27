@@ -37,7 +37,8 @@ d3.csv("data/iris.csv").then((data) => {
             .attr("cy", (d) => { return (Y_SCALE(d.Sepal_Length) + margins.top); })
             .attr("r", 5)
             .attr("fill", (d) => { return species_color[d.Species] })
-            .attr("class", (d) => {return "pointone " + d.Species});
+            .attr("class", (d) => {return "pointone " + d.Species})
+            .attr("id", (d) => {return "one" + d.id});
 
 
     //Generates the x axis
@@ -106,7 +107,7 @@ d3.csv("data/iris.csv").then((data) => {
 
 
     //Generates all points in the csv
-    FRAME2.selectAll("circle")
+    let circle = FRAME2.selectAll("circle")
         .data(data)
         .enter()
         .append("circle")
@@ -114,51 +115,50 @@ d3.csv("data/iris.csv").then((data) => {
             .attr("cy", (d) => { return (Y_SCALE(d.Sepal_Width) + margins.top); })
             .attr("r", 5)
             .attr("fill", (d) => { return species_color[d.Species] })
-            .attr("class", (d) => {return "pointtwo " + d.Species});
+            .attr("class", (d) => {return "pointtwo " + d.Species})
+            .attr("id", (d) => {return "two" + d.id});
 
 
-    function handleOver(d) {
-        let species = d.className.baseVal.split(" ")[1];
-        let collection = document.getElementsByClassName(species);
-        for (let i = 0; i < collection.length; i++) {
-            let next = collection[i];
-            let nextClass = next.className.baseVal.split(" ")[0];
-            
-            if (nextClass == "pointone") {
-                next.style.stroke = "orange"
-                next.style.opacity = 1
-            }
-            else if (nextClass == "bar") {
-                next.style.stroke = "orange"
-            }
-        }
-    }
+    //Updates the chart when a selection is started
+    function updateChart() {
+        extent = d3.brushSelection(this)
+        
+        circle.classed("selected", function(d){ return isBrushed(extent, X_SCALE(d.Petal_Width) + margins.left, Y_SCALE(d.Sepal_Width) + margins.top) } )
 
-    function handleLeave(d) {
-        let species = d.className.baseVal.split(" ")[1];
-        let collection = document.getElementsByClassName(species);
-        for (let i = 0; i < collection.length; i++) {
-            let next = collection[i];
-            let nextClass = next.className.baseVal.split(" ")[0];
-            
-            if (nextClass == "pointone") {
-                next.style.stroke = "None"
-                next.style.opacity = 0.5
-            }
-            else if (nextClass == "bar") {
-                next.style.stroke = "None"
+        let collection = [].slice.call(document.getElementsByClassName("selected"));
+
+        //Builds a list of the selected species
+        let selected = []
+        for (let i=0; i<collection.length; i++) {
+            next = collection[i].className.baseVal.split(" ")[1]
+            if (!selected.includes(next)) {
+                selected.push(next)
             }
         }
+
+        //Highlights the bar chart based on the list
+        FRAME3.selectAll(".bar").classed("selected", function(){
+            return selected.includes(this.id)})
+
+        //Highlights the corresponding points in frame1
+        FRAME1.selectAll(".pointone").classed("selected", function(d){
+            return collection.includes(document.getElementById("two" + d.id))})
     }
 
-    function addListeners() {
-        FRAME2.selectAll(".pointtwo")
-            .on("mouseover", function () {
-                handleOver(this)})
-            .on("mouseleave", function () {
-                handleLeave(this)})
+
+    //Determines if the given point is brushed
+    function isBrushed(brush_coords, cx, cy) {
+       var x0 = brush_coords[0][0],
+           x1 = brush_coords[1][0],
+           y0 = brush_coords[0][1],
+           y1 = brush_coords[1][1];
+        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
     }
-    addListeners()
+
+    FRAME2.call( d3.brush()
+        .extent( [ [margins.left,margins.top], [frame_width - margins.left,frame_height - margins.top] ] )
+        .on("start brush", updateChart))      
+
 
 });
 
@@ -211,7 +211,8 @@ Object.entries(species_color).forEach(entry => {
             .attr("y", (y_scale(50)))
             .attr("height", ( frame_height - y_scale(50) - margins.bottom))
             .attr("width", x_scale.bandwidth() - 5)
-            .attr("class", "bar " + key);
+            .attr("class", "bar")
+            .attr("id", key);
 });
 
 FRAME3.selectAll(".bar")
